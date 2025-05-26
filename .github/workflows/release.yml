@@ -41,7 +41,7 @@ jobs:
           context: .
           push: true
           tags: ${{ env.IMAGE_NAME }}:latest
-          provenance: mode=min
+          provenance: false
 
   chart:
     permissions:
