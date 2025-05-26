@@ -2,6 +2,10 @@ name: Release
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: ['Tag']
+    types:
+      - completed
   push:
     tags: [ '*' ]
 
