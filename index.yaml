@@ -3,12 +3,12 @@ entries:
   flux-go-test:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2025-05-26T20:33:24.983640635Z"
+    created: "2025-05-28T11:13:15.759630788Z"
     description: A Helm chart for Kubernetes
-    digest: 4bb22d83b9243ee4cca06b8a20c368b4dc960404f0174a1f6ec3c840d03ee05f
+    digest: 2d59a3ca3eab7d63bf8a0e7e009033f07ccf2e018ad52b9e2c4dbfa1a0be1b02
     name: flux-go-test
     type: application
     urls:
     - https://jmpargana.github.io/flux-go-test/flux-go-test-0.1.0.tgz
     version: 0.1.0
-generated: "2025-05-26T20:33:24.982338146Z"
+generated: "2025-05-28T11:13:15.758981412Z"
