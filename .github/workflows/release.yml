@@ -41,6 +41,7 @@ jobs:
           context: .
           push: true
           tags: ${{ env.IMAGE_NAME }}:latest
+          platforms: linux/arm64,linux/amd64
           provenance: false
 
   chart:
