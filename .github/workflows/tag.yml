@@ -3,6 +3,9 @@ name: Tag
 on:
   push:
     branches: [ "main" ]
+    
+env:
+  CHART_PATH: ./charts/flux-go-test/Chart.yaml
 
 jobs:
   tag:
@@ -11,8 +14,26 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - name: Bump version and push tag
+      - name: Get next tag
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }} 
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag_prefix: v
+          dry_run: true 
+
+      - name: Bump chart version
+        run: |
+          VERSION="${{ steps.tag_version.outputs.new_tag }}"
+          VERSION="${VERSION#v}"
+          sed -i "s/^version: .*/version: ${VERSION}/" $CHART_PATH
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add $CHART_PATH
+          git commit -m "chore(helm): bump version to ${VERSION}"
+          git push
+
+      - name: Create Git tag
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
