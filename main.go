@@ -14,6 +14,8 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
@@ -65,6 +67,10 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func probeHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+}
+
 func main() {
 	if err := run(); err != nil {
 		log.Fatalln(err)
@@ -106,19 +112,23 @@ func run() (err error) {
 	return
 }
 
+func OTelMiddleware(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		routePattern := chi.RouteContext(r.Context()).RoutePattern()
+		handler := otelhttp.WithRouteTag(routePattern, h)
+		handler.ServeHTTP(w, r)
+	})
+}
+
 func newHTTPHandler() http.Handler {
-	mux := http.NewServeMux()
-
-	// handleFunc is a replacement for mux.HandleFunc
-	// which enriches the handler's HTTP instrumentation with the pattern as the http.route.
-	handleFunc := func(pattern string, handlerFunc func(http.ResponseWriter, *http.Request)) {
-		// Configure the "http.route" for the HTTP instrumentation.
-		handler := otelhttp.WithRouteTag(pattern, http.HandlerFunc(handlerFunc))
-		mux.Handle(pattern, handler)
-	}
-
-	handleFunc("/", rootHandler)
-
-	handler := otelhttp.NewHandler(mux, "/")
-	return handler
+	r := chi.NewRouter()
+	r.Use(OTelMiddleware)
+	r.Use(middleware.Logger)
+	r.Get("/", rootHandler)
+	r.Get("/healthz", probeHandler)
+	r.Get("/readyz", probeHandler)
+	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "Not Found", http.StatusNotFound)
+	})
+	return otelhttp.NewHandler(r, "/")
 }
