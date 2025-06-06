@@ -35,7 +35,7 @@ func Test_newHTTPHandler(t *testing.T) {
 }
 
 func Test_weightedRandom(t *testing.T) {
-	codes := []Item{
+	codes := []item{
 		{http.StatusOK, 70},
 		{http.StatusBadRequest, 20},
 		{http.StatusInternalServerError, 10},

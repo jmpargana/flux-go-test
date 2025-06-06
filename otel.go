@@ -20,7 +20,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/trace"
 )
 
-const schemaName = "https://github.com/grafana/docker-otel-lgtm"
+const schemaName = "https://github.com/jmpargana/flux-go-test"
 
 var (
 	tracer = otel.Tracer(schemaName)
